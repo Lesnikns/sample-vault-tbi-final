@@ -95,3 +95,47 @@ if (uploadForm) {
         }
     });
 }
+
+// subida de sample con validacion de bpm
+document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // obtengo token de login
+    const token = localStorage.getItem('token');
+    if (!token) {
+        showModal('Error', 'Debes iniciar sesión para subir samples.');
+        return;
+    }
+    // obtengo los datos del formulario 
+    const displayNameInput = document.getElementById('display_name').value;
+    const categorySelect = document.getElementById('category').value;
+    const bpmInput = document.getElementById('bpm').value;
+    const audioFileInput = document.getElementById('audioFile').files[0];
+
+    // formo el sample que subira el usuario
+    const formData = new FormData();
+    formData.append('display_name', displayNameInput);
+    formData.append('category', categorySelect);
+    formData.append('bpm', bpmInput);
+    formData.append('audioFile', audioFileInput);
+
+    try{
+        const response = await fetch('/api/samples/upload', {
+            method: 'POST',
+            headers: {'authorization': `Bearer ${token}`},
+            body: formData
+        });
+
+        const resultado = await response.json();
+        if (response.ok) { 
+            showModal('Éxito', resultado.message);
+            document.getElementById('uploadForm').reset();
+        } else { 
+            showModal('Error de validacion', resultado.message);
+        }
+    }
+    catch (error) {
+        console.error("Error en la petición:", error);
+        showModal("Error", "No se pudo conectar con el servidor.");
+    }
+});
