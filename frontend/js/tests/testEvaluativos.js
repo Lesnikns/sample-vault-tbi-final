@@ -96,7 +96,7 @@ testUtils.createTestButton("Test Archivo Mayor a 5MB", async (btn) => {
         testUtils.setSuccess(btn);
     }
     else {
-        testUtils.setError(btn);
+        testUtils.setFailure(btn);
      }
 });
 

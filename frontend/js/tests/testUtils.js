@@ -38,5 +38,8 @@
 
     setSuccess(btn) {
         btn.className = "w3-button w3-block w3-section w3-round w3-green";
-    }
+    },
+    setFailure(btn) {
+    	btn.className = "w3-button w3-block w3-section w3-round w3-red";
+	}
 };
