@@ -43,3 +43,59 @@ testUtils.createTestButton("Test subir sample con BPM erroneo", async (btn) => {
         testUtils.setSuccess(btn);
 
 }); 
+
+/**
+ * Test: POST /api/samples/upload
+ * Validación de límite de tamaño (413 Payload Too Large)
+ */
+testUtils.createTestButton("Test Archivo Mayor a 5MB", async (btn) => {
+
+    // 1. Login para obtener token válido
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    // 2. Crear archivo simulado de más de 5 MB
+    const bigContent = new Uint8Array(6 * 1024 * 1024);
+
+    const bigFile = new Blob(
+        [bigContent],
+        { type: 'audio/wav' }
+    );
+
+    // 3. Crear FormData
+    const formData = new FormData();
+
+    formData.append('display_name', 'Archivo Grande');
+    formData.append('category', 'Drums');
+    formData.append('bpm', '120');
+
+    formData.append(
+        'audioFile',
+        bigFile,
+        'archivoGrande.wav'
+    );
+
+    // 4. Enviar request
+    const response = await fetch('/api/samples/upload', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    const data = await response.json();
+
+    testUtils.log(data);
+
+    // 5. Verificar respuesta esperada
+    if (
+        response.status === 413 &&
+        data.message === 'El archivo supera el límite de tamaño permitido'
+    ) {
+        testUtils.setSuccess(btn);
+    }
+    else {
+        testUtils.setError(btn);
+     }
+});

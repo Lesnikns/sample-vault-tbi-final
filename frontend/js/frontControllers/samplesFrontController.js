@@ -131,7 +131,18 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
             showModal('Éxito', resultado.message);
             document.getElementById('uploadForm').reset();
         } else { 
-            showModal('Error de validacion', resultado.message);
+            // Error 413: archivo demasiado grande
+                if (response.status === 413) {
+                     showModal(
+                        'Error',
+                        'El archivo supera el límite de tamaño permitido'
+                     );
+
+                     return;
+                }
+
+                 // Otros errores
+                showModal('Error de validacion', resultado.message);
         }
     }
     catch (error) {
