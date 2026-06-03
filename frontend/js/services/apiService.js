@@ -6,7 +6,7 @@
 */
 
 // Configuración base de la API
-const API_URL = "http://localhost:3000/api";
+const API_URL = "/api";
 
 const apiService = {
     // Función centralizada para peticiones Fetch
