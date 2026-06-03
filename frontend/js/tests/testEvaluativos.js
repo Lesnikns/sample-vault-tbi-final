@@ -99,3 +99,28 @@ testUtils.createTestButton("Test Archivo Mayor a 5MB", async (btn) => {
         testUtils.setError(btn);
      }
 });
+
+// Test Registro - Contraseña demasiado corta
+
+testUtils.createTestButton("Test Registro - Password Corta", async (btn) => {
+
+    const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: 'usuarioTest',
+            password: '123'
+        })
+    });
+
+    const data = await response.json();
+    testUtils.log(data);
+
+    // valida HTTP 400
+    if (
+        response.status === 400 &&
+        data.message === "La contraseña es demasiado corta"
+    ) {
+        testUtils.setSuccess(btn);
+    }
+});
