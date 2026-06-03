@@ -8,7 +8,7 @@
 /**
  * Importar módulo/"biblioteca" para gestionar base de datos
  */
-const mysql = require('mysql2');
+const mysql = require('mysql2');   
 
 /**
  * Crear un pool de conexiones (más eficiente que una conexión única)
