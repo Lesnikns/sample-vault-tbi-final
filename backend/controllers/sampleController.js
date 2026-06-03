@@ -76,6 +76,19 @@ class SampleController
         }
         catch (error)
         {
+            // Error de tamaño máximo permitido por Multer
+                if (error.code === 'LIMIT_FILE_SIZE')
+                {
+                    return res.status(413).json({
+                        message: "El archivo supera el límite de tamaño permitido"
+                    });
+                }
+
+                // En caso de error de DB, intentar limpiar el archivo físico (Extra)
+                if (req.file)
+                {
+                    fileHelper.deleteFile(`/uploads/${req.file.filename}`);
+                }
             res.status(500).json({ message: "Error al recuperar la biblioteca.", error: error.message });
         }
     }
