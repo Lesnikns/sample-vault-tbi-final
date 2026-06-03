@@ -1,101 +1,116 @@
-
 // funcion okLogin
 
-async function okLogin()
- {
+async function okLogin() {
     // 1. Login como productor (pepe) para obtener un token válido
-     const response = await fetch('/api/auth/login', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ username: 'pepe', password: '12345' }) // Usamos pepe hardcodeado
-     });
-     const data = await response.json();
-     // Guardamos el token para tests de samples
-     localStorage.setItem('test_token', data.token);
- }
+    const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: 'pepe',
+            password: '12345'
+        }) // Usamos pepe hardcodeado
+    });
+
+    const data = await response.json();
+
+    // Guardamos el token para tests de samples
+    localStorage.setItem('test_token', data.token);
+}
 
 // "Test: Subida - Coherencia del BPM"
 
-testUtils.createTestButton("Test subir sample con BPM erroneo", async (btn) => {
+testUtils.createTestButton(
+    "Test subir sample con BPM erroneo",
+    async (btn) => {
 
-    await okLogin(); // se encuentra un error en el login, el token es invalido. 
-    const token=localStorage.getItem('test_token');
+        await okLogin(); // se encuentra un error en el login, el token es invalido.
+        const token = localStorage.getItem('test_token');
 
-    // crear formdata y blob para testear
-    const formData = new FormData();
-    formData.append('display_name', 'Test bpm ilogico');
-    formData.append('category', 'Drums');
-    formData.append('bpm', 'ciento veinte');
+        // crear formdata y blob para testear
+        const formData = new FormData();
+        formData.append('display_name', 'Test bpm ilogico');
+        formData.append('category', 'Drums');
+        formData.append('bpm', 'ciento veinte');
 
-    const blob = new Blob(["Simulated Audio Content"], { type: 'audio/wav' });
-    formData.append('audioFile', blob, 'BPM-ilogico.wav');
+        const blob = new Blob(
+            ["Simulated Audio Content"],
+            { type: 'audio/wav' }
+        );
 
-    const response = await fetch('/api/samples/upload', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-    });
+        formData.append('audioFile', blob, 'BPM-ilogico.wav');
 
-    // ubicar error y marcar como verde en caso de error 400
-    const data = await response.json();
-    testUtils.log(data);
-    if (response.status == 400)
-        testUtils.setSuccess(btn);
+        const response = await fetch('/api/samples/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
 
-}); 
+        // ubicar error y marcar como verde en caso de error 400
+        const data = await response.json();
+        testUtils.log(data);
+
+        if (response.status == 400) {
+            testUtils.setSuccess(btn);
+        }
+    }
+);
 
 /**
  * Test: POST /api/samples/upload
  * Validación de límite de tamaño (413 Payload Too Large)
  */
-testUtils.createTestButton("Test Archivo Mayor a 5MB", async (btn) => {
+testUtils.createTestButton(
+    "Test Archivo Mayor a 5MB",
+    async (btn) => {
 
-    // 1. Login para obtener token válido
-    await okLogin();
-    const token = localStorage.getItem('test_token');
+        // 1. Login para obtener token válido
+        await okLogin();
+        const token = localStorage.getItem('test_token');
 
-    // 2. Crear archivo simulado de más de 5 MB
-    const bigContent = new Uint8Array(6 * 1024 * 1024);
+        // 2. Crear archivo simulado de más de 5 MB
+        const bigContent = new Uint8Array(6 * 1024 * 1024);
 
-    const bigFile = new Blob(
-        [bigContent],
-        { type: 'audio/wav' }
-    );
+        const bigFile = new Blob(
+            [bigContent],
+            { type: 'audio/wav' }
+        );
 
-    // 3. Crear FormData
-    const formData = new FormData();
+        // 3. Crear FormData
+        const formData = new FormData();
 
-    formData.append('display_name', 'Archivo Grande');
-    formData.append('category', 'Drums');
-    formData.append('bpm', '120');
+        formData.append('display_name', 'Archivo Grande');
+        formData.append('category', 'Drums');
+        formData.append('bpm', '120');
 
-    formData.append(
-        'audioFile',
-        bigFile,
-        'archivoGrande.wav'
-    );
+        formData.append(
+            'audioFile',
+            bigFile,
+            'archivoGrande.wav'
+        );
 
-    // 4. Enviar request
-    const response = await fetch('/api/samples/upload', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-        body: formData
-    });
+        // 4. Enviar request
+        const response = await fetch('/api/samples/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    testUtils.log(data);
+        testUtils.log(data);
 
-    // 5. Verificar respuesta esperada
-    if (
-        response.status === 413 &&
-        data.message === 'El archivo supera el límite de tamaño permitido'
-    ) {
-        testUtils.setSuccess(btn);
+        // 5. Verificar respuesta esperada
+        if (
+            response.status === 413 &&
+            data.message === 'El archivo supera el límite de tamaño permitido'
+        ) {
+            testUtils.setSuccess(btn);
+        } else {
+            testUtils.setFailure(btn);
+        }
     }
-    else {
-        testUtils.setError(btn);
-     }
-});
+);
