@@ -19,7 +19,26 @@ router.use(verifyToken);
 
 // Subir un nuevo audio: POST /api/samples/upload
 // 'audioFile' es el nombre que debe tener el campo file en el FormData del frontend
-router.post('/upload', uploadMiddleware, sampleController.uploadSample);
+router.post('/upload', (req, res, next) => {
+
+    uploadMiddleware(req, res, (err) => {
+
+        if (err && err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(413).json({
+                message: 'El archivo supera el límite de tamaño permitido'
+            });
+        }
+
+        if (err) {
+            return res.status(400).json({
+                message: err.message
+            });
+        }
+
+        next();
+    });
+
+}, sampleController.uploadSample);
 
 // Listar mis samples: GET /api/samples/my-samples
 router.get('/my-samples', sampleController.getMySamples);
