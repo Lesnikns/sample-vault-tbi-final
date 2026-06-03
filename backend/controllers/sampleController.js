@@ -33,7 +33,7 @@ class SampleController
             const valorbpm=parseInt(bpm);
             if (isNaN(valorbpm) || valorbpm < 20 || valorbpm > 300) {
                 fileHelper.deleteFile(`/uploads/${req.file.filename}`);
-               return res.status(404).json({ message: "El registro no existe o ya fue eliminado." });
+               return res.status(400).json({ message: "BPM inválido. Ingrese un valor numerico correcto" });
             }
 
             const userId = req.userId; // Proveniente del verifyToken
@@ -105,7 +105,7 @@ class SampleController
             const sample = await sampleRepo.findById(id, userId);
             
             if (!sample) {
-                return res.status(404).json({ message: "El sample no existe o no tienes permisos para eliminarlo." });
+                return res.status(404).json({ message: "El sample no existe o ya fue eliminado." });
             }
 
             // 2. Ejecutar sp_delete_sample en la base de datos
