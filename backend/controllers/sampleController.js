@@ -28,6 +28,13 @@ class SampleController
                 fileHelper.deleteFile(`/uploads/${req.file.filename}`);
                 return res.status(400).json({ message: "El nombre y la categoría son obligatorios." });
             }
+            
+            // Validación de bpm al subir el sample
+            const valorbpm=parseInt(bpm);
+            if (isNaN(valorbpm) || valorbpm < 20 || valorbpm > 300) {
+                fileHelper.deleteFile(`/uploads/${req.file.filename}`);
+                return res.status(400).json({message: "BPM inválido. Ingrese un valor numérico correcto"});
+            }
 
             const userId = req.userId; // Proveniente del verifyToken
             const filename = req.file.filename;
