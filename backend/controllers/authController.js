@@ -33,7 +33,7 @@ class AuthController
             // 2. Validación de longitud de contraseña GUILLE-BARBI
             if (password.length < 6) {
                 return res.status(400).json({
-                    message: "La contraseña es demasiado corta"});
+                    message: "La contraseña es demasiado corta (Debe tener 6 o más caracteres)"});
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);            
