@@ -50,6 +50,15 @@ if (registerForm)
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
+        // Validación en frontend
+        if (password.length < 6) {
+            showModal(
+                'Error de Registro',
+                'La contraseña es demasiado corta (Debe tener 6 o más caracteres)'
+            );
+            return;
+        }
+
         try 
         {
             await apiService.request('/auth/register', 'POST', { username, password });
