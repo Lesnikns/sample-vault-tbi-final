@@ -79,10 +79,16 @@ const uploadForm = document.getElementById('uploadForm');
 if (uploadForm) {
     uploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const bpm = parseInt(document.getElementById('bpm').value, 10);
+
+        if (isNaN(bpm) || bpm < 20 || bpm > 300) {
+            showModal('Error de validación', 'El BPM debe ser un número entre 20 y 300.');
+            return;
+        }
         const formData = new FormData();
         formData.append('display_name', document.getElementById('display_name').value);
         formData.append('category', document.getElementById('category').value);
-        formData.append('bpm', document.getElementById('bpm').value);
+        formData.append('bpm', bpm);
         formData.append('audioFile', document.getElementById('audioFile').files[0]);
 
         try {
@@ -96,57 +102,3 @@ if (uploadForm) {
     });
 }
 
-// subida de sample con validacion de bpm
-document.getElementById('uploadForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    // obtengo token de login
-    const token = localStorage.getItem('token');
-    if (!token) {
-        showModal('Error', 'Debes iniciar sesión para subir samples.');
-        return;
-    }
-    // obtengo los datos del formulario 
-    const displayNameInput = document.getElementById('display_name').value;
-    const categorySelect = document.getElementById('category').value;
-    const bpmInput = document.getElementById('bpm').value;
-    const audioFileInput = document.getElementById('audioFile').files[0];
-
-    // formo el sample que subira el usuario
-    const formData = new FormData();
-    formData.append('display_name', displayNameInput);
-    formData.append('category', categorySelect);
-    formData.append('bpm', bpmInput);
-    formData.append('audioFile', audioFileInput);
-
-    try{
-        const response = await fetch('/api/samples/upload', {
-            method: 'POST',
-            headers: {'authorization': `Bearer ${token}`},
-            body: formData
-        });
-
-        const resultado = await response.json();
-        if (response.ok) { 
-            showModal('Éxito', resultado.message);
-            document.getElementById('uploadForm').reset();
-        } else { 
-            // Error 413: archivo demasiado grande
-                if (response.status === 413) {
-                     showModal(
-                        'Error',
-                        'El archivo supera el límite de tamaño permitido'
-                     );
-
-                     return;
-                }
-
-                 // Otros errores
-                showModal('Error de validacion', resultado.message);
-        }
-    }
-    catch (error) {
-        console.error("Error en la petición:", error);
-        showModal("Error", "No se pudo conectar con el servidor.");
-    }
-});

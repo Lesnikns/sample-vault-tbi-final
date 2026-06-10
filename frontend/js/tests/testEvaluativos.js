@@ -119,7 +119,7 @@ testUtils.createTestButton("Test Registro - Password Corta", async (btn) => {
     // valida HTTP 400
     if (
         response.status === 400 &&
-        data.message === "La contraseña es demasiado corta"
+        data.message === "La contraseña es demasiado corta (Debe tener 6 o más caracteres)"
     ) {
         testUtils.setSuccess(btn);
     }
