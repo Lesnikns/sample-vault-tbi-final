@@ -142,8 +142,6 @@ testUtils.createTestButton("Test Borrado Fantasma (ID inexistente)", async (btn)
     testUtils.log(data);
 
     if (response.status === 404) {
-        document.getElementById('modal-message').textContent = data.message;
-        document.getElementById('error-modal').style.display = 'block';
         testUtils.setSuccess(btn);
     }
 });
